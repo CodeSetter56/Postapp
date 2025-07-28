@@ -20,8 +20,9 @@ export const signup = async (req, res) => {
     password: hashedPass,
   });
   cookieGen(res, newUser);
-  res.send("User created successfully");
-  console.log(newUser);
+  const removePassUser = newUser.toObject()
+  delete removePassUser.password
+  res.json(removePassUser);
 };
 
 export const login = async (req, res) => {
@@ -38,12 +39,12 @@ export const login = async (req, res) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.send("Invalid credentials");
   cookieGen(res, user);
-  res.send("User logged in successfully");
-  console.log(user);
-  
+  const removePassUser = user.toObject();
+  delete removePassUser.password;
+  res.json(removePassUser);
 };
 
 export const logout = (req, res) => {
   res.clearCookie("token");
-  res.send("User logged out successfully");
+  res.json({message: "User logged out successfully"});
 };
