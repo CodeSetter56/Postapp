@@ -33,6 +33,11 @@ export const AuthProvider = ({ children }) => {
     }
     checkUser()
   }, [])
+
+  //checking the user on every reload
+   useEffect(() => {
+     console.log( user);
+   }, [user]);
   
 
   const signup = async (userData) => {
