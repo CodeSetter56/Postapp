@@ -1,7 +1,8 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 
 export const AuthContext = createContext({
   user: null,
+  loading:true,
   signup: async () => {},
   login: async () => {},
   logout: async () => {},
@@ -9,6 +10,30 @@ export const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  //to remove flicker caused during fetching the user details
+  const [loading, setLoading] = useState(true);
+
+  //for persistant user data
+  useEffect(() => {
+    const checkUser = async() =>{
+      try {
+        const res = await fetch("api/user/me")
+        if(res.ok){
+          const data = await res.json()
+          setUser(data)
+        }else{
+          setUser(null)
+        }
+      } catch (error) {
+        setUser(null)
+        console.error("failed to fetch user",error);
+      }finally{
+        setLoading(false)
+      }
+    }
+    checkUser()
+  }, [])
+  
 
   const signup = async (userData) => {
     const res = await fetch("/api/auth/signup", {
@@ -61,7 +86,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, signup, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, signup, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

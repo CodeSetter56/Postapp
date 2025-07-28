@@ -2,12 +2,17 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   const handleLogout = async (e) => {
     e.preventDefault();
     await logout();
   };
+
+  if (loading) {
+    // You can return a loading spinner or just null to show nothing
+    return <div className="navbar bg-base-100 shadow-sm"></div>;
+  }
 
   return (
     <div>
