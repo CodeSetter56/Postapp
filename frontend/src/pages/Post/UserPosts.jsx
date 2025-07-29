@@ -1,8 +1,10 @@
+import { useAuth } from "../../context/AuthContext";
 import { usePost } from "../../context/PostContext"; 
 import Post from "./Post";
 
 function UserPosts() {
   const { posts, loading, mode, setMode } = usePost();
+  const {user} = useAuth()
 
   const handleMode = (e) => {
     e.preventDefault();
@@ -23,7 +25,7 @@ function UserPosts() {
     <div className="w-full flex flex-col items-start gap-4">
       <div className="w-full flex justify-between items-center">
         <h2 className="text-2xl font-bold">Posts</h2>
-        <div className="flex gap-3">
+        {user && (<div className="flex gap-3">
           <button
             className={`btn ${
               mode === "allposts" ? "btn-ghost" : "btn-primary"
@@ -42,7 +44,7 @@ function UserPosts() {
           >
             My Posts
           </button>
-        </div>
+        </div>)}
       </div>
 
       {posts.length > 0 ? (
