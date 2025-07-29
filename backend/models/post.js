@@ -5,6 +5,7 @@ const postSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      req:true
     },
     date: {
       type: Date,
@@ -13,13 +14,13 @@ const postSchema = new mongoose.Schema(
     content: {
       type: String,
       required: true,
-      likes: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
-      ],
     },
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );

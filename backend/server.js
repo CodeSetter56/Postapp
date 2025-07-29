@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 
 import authRouter from "./routes/auth.js";
 import userRouter from "./routes/user.js";
+import postRouter from "./routes/post.js";
 
 dotenv.config();
 const app = express();
@@ -15,6 +16,7 @@ app.use(cookieParser());
 
 app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)
+app.use("/api/post",postRouter)
 
 const connectDB = async () => {
   try {
