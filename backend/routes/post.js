@@ -11,7 +11,7 @@ router.get("/myposts",isLoggedin,asyncHandler(getMyPosts))
 router.post("/create",isLoggedin,asyncHandler(createPost))
 router.get("/likeCount/:id",isLoggedin,asyncHandler(likeCount))
 router.put("/likeUnlike/:id",isLoggedin,asyncHandler(likeUnlike))
-router.post("/edit/:id",isLoggedin,asyncHandler(EditPost))
+router.put("/edit/:id",isLoggedin,asyncHandler(EditPost))
 router.delete("/delete/:id",isLoggedin,asyncHandler(DeletePost))
 
-export default router
+export default router 

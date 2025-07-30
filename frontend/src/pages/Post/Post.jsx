@@ -1,21 +1,23 @@
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
-import { FaEdit } from "react-icons/fa";
-
-import { useState, useEffect } from "react";
-import {useNavigate} from "react-router-dom"
-
 import { MdDelete } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { usePost } from "../../context/PostContext";
 
 function Post({ post }) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const { setPostToEdit, deletePost, postToEdit } = usePost();
+
   // set default like count acc to like array length
   const [likeCount, setLikeCount] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
   const isPostOwner = user && post.user && user._id === post.user._id;
+  const isBeingEdited = postToEdit !== null;
 
   //runs on render to see if the current user previously liked the post
   useEffect(() => {
@@ -23,17 +25,21 @@ function Post({ post }) {
       // sets state to true or false by checking if userid is included in likes array
       setIsLiked(post.likes.includes(user._id));
     }
-  }, [post.likes, user]);//rerenders on change in likes or the user
+  }, [post.likes, user]); //rerenders on change in likes or the user
+
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      deletePost(post._id);
+    }
+  };
 
   //since like and unliking a post is a feature exclusive to that post and won't be required anywhere else, it's not defined in context
   const handleLike = async () => {
     if (!user) {
-      navigate("/auth")
+      navigate("/auth");
       return;
     }
     setError("");
-
-    // Optimistic UI Update: Update the state immediately for a fast UI response.
     if (isLiked) {
       setLikeCount((prev) => prev - 1);
       setIsLiked(false);
@@ -41,7 +47,6 @@ function Post({ post }) {
       setLikeCount((prev) => prev + 1);
       setIsLiked(true);
     }
-
     try {
       const res = await fetch(`/api/post/likeUnlike/${post._id}`, {
         method: "PUT",
@@ -51,7 +56,6 @@ function Post({ post }) {
       }
     } catch (err) {
       setError(err.message);
-      // Revert UI on Failure: If the API call fails, revert the state to what it was.
       if (isLiked) {
         setLikeCount((prev) => prev + 1);
         setIsLiked(true);
@@ -75,7 +79,11 @@ function Post({ post }) {
         <p>{post.content}</p>
         <div className="card-actions justify-between items-center">
           <div className="flex items-center gap-2">
-            <button onClick={handleLike} className="btn btn-ghost btn-sm">
+            <button
+              onClick={handleLike}
+              className="btn btn-ghost btn-sm"
+              disabled={isBeingEdited}
+            >
               {isLiked ? (
                 <AiFillLike className="text-primary" />
               ) : (
@@ -84,13 +92,20 @@ function Post({ post }) {
             </button>
             <span>{likeCount}</span>
           </div>
-
           {isPostOwner && (
             <div className="flex gap-2">
-              <button className="btn btn-secondary btn-sm">
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setPostToEdit(post)}
+                disabled={isBeingEdited}
+              >
                 <FaEdit />
               </button>
-              <button className="btn btn-accent btn-sm">
+              <button
+                className="btn btn-accent btn-sm"
+                disabled={isBeingEdited}
+                onClick={handleDelete}
+              >
                 <MdDelete />
               </button>
             </div>

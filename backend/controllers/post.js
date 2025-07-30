@@ -44,6 +44,7 @@ export const likeUnlike = async (req, res) => {
   } else {
     await postModel.updateOne(
       { _id: postId },
+      //atomic operation. if many users like/unlike at the same time, their actions would not be overwritten
       { $addToSet: { likes: userId } }
     );
     res.status(200).json({ message: "Post liked successfully" });
@@ -80,7 +81,7 @@ export const EditPost = async (req, res) => {
     .findByIdAndUpdate(postId, { content }, { new: true, runValidators: true })
     .populate("user");
   res.status(200).json({
-    message: "edited",
+    message: "post edited successfully",
     post: updatedPost,
   });
 };
