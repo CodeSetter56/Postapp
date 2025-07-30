@@ -25,6 +25,7 @@ function Post({ post }) {
     }
   }, [post.likes, user]);//rerenders on change in likes or the user
 
+  //since like and unliking a post is a feature exclusive to that post and won't be required anywhere else, it's not defined in context
   const handleLike = async () => {
     if (!user) {
       navigate("/auth")
@@ -43,7 +44,7 @@ function Post({ post }) {
 
     try {
       const res = await fetch(`/api/post/likeUnlike/${post._id}`, {
-        method: "POST",
+        method: "PUT",
       });
       if (!res.ok) {
         throw new Error("Failed to update like status on the server.");
