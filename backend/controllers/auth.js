@@ -20,8 +20,8 @@ export const signup = async (req, res) => {
     password: hashedPass,
   });
   cookieGen(res, newUser);
-  const removePassUser = newUser.toObject()
-  delete removePassUser.password
+  const removePassUser = newUser.toObject();
+  delete removePassUser.password;
   res.json(removePassUser);
 };
 
@@ -37,7 +37,7 @@ export const login = async (req, res) => {
       .json({ message: "Password must be at least 6 characters long" });
   }
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.send("Invalid credentials");
+  if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
   cookieGen(res, user);
   const removePassUser = user.toObject();
   delete removePassUser.password;
@@ -46,5 +46,5 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   res.clearCookie("token");
-  res.json({message: "User logged out successfully"});
+  res.json({ message: "User logged out successfully" });
 };

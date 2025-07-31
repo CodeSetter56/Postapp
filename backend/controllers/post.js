@@ -4,6 +4,8 @@ import postModel from "../models/post.js";
 export const createPost = async (req, res) => {
   const user = await userModel.findById(req.user.id);
   const { content } = req.body;
+  if (content === "")
+    return res.status(400).json({ message: "enter content" });
   const post = await postModel.create({
     user: user._id,
     content,
@@ -66,6 +68,8 @@ export const EditPost = async (req, res) => {
   const { id: postId } = req.params;
   const userId = req.user.id;
   const { content } = req.body;
+  if (content === "")
+    return res.status(400).json({ message: "enter content" });
   const post = await postModel.findById(postId);
 
   if (!post) {
@@ -78,7 +82,7 @@ export const EditPost = async (req, res) => {
   }
 
   const updatedPost = await postModel
-    .findByIdAndUpdate(postId, { content }, { new: true, runValidators: true })
+    .findByIdAndUpdate(postId, { content,isEdited:true }, { new: true, runValidators: true })
     .populate("user");
   res.status(200).json({
     message: "post edited successfully",
@@ -90,7 +94,7 @@ export const DeletePost = async (req, res) => {
   const { id: postId } = req.params;
   const userId = req.user.id;
   const post = await postModel.findById(postId);
-  
+
   if (!post) {
     return res.status(404).json({ message: "Post not found." });
   }

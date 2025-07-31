@@ -1,8 +1,10 @@
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../context/AuthContext";
 import { usePost } from "../../context/PostContext";
 
@@ -40,6 +42,7 @@ function Post({ post }) {
       return;
     }
     setError("");
+    //optimestic ui change: change the like state and count instantly for fast ui change and rollback if server doesn't respond
     if (isLiked) {
       setLikeCount((prev) => prev - 1);
       setIsLiked(false);
@@ -56,6 +59,7 @@ function Post({ post }) {
       }
     } catch (err) {
       setError(err.message);
+      //rollback
       if (isLiked) {
         setLikeCount((prev) => prev + 1);
         setIsLiked(true);
@@ -76,7 +80,7 @@ function Post({ post }) {
       </figure>
       <div className="card-body">
         <h2 className="card-title">@{post.user?.username}</h2>
-        <p>{post.content}</p>
+        <p className="truncate text-sm">{post.content}</p>
         <div className="card-actions justify-between items-center">
           <div className="flex items-center gap-2">
             <button
@@ -92,6 +96,7 @@ function Post({ post }) {
             </button>
             <span>{likeCount}</span>
           </div>
+          {post.isEdited && <div className="text-sm text-gray-600">edited</div>}
           {isPostOwner && (
             <div className="flex gap-2">
               <button

@@ -21,6 +21,10 @@ const postSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    isEdited:{
+      type:Boolean,
+      default:false
+    }
   },
   { timestamps: true }
 );

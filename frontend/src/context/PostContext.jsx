@@ -2,7 +2,6 @@ import { createContext, useState, useContext, useEffect } from "react";
 
 export const PostContext = createContext({
   posts: [],
-  loading: true,
   mode: "allposts",
   //since it will be used in other pages
   setMode: () => {},
@@ -19,7 +18,6 @@ export const PostContext = createContext({
 export const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const [postToEdit, setPostToEdit] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState("allposts");
 
   useEffect(() => {
@@ -50,7 +48,6 @@ export const PostProvider = ({ children }) => {
   };
 
   const getAllPosts = async () => {
-    setLoading(true);
     try {
       const res = await fetch("/api/post/allposts");
       const data = await res.json();
@@ -59,13 +56,10 @@ export const PostProvider = ({ children }) => {
     } catch (error) {
       console.error(error);
       setPosts([]);
-    } finally {
-      setLoading(false);
     }
   };
 
   const getMyPosts = async () => {
-    setLoading(true);
     try {
       const res = await fetch("/api/post/myposts");
       const data = await res.json();
@@ -74,8 +68,6 @@ export const PostProvider = ({ children }) => {
     } catch (error) {
       console.error(error);
       setPosts([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -119,7 +111,6 @@ export const PostProvider = ({ children }) => {
     <PostContext.Provider
       value={{
         posts,
-        loading,
         mode,
         setMode,
         createPost,
