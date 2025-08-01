@@ -1,23 +1,43 @@
 import userModel from "../models/user.js";
 import postModel from "../models/post.js";
+import { UploadOnCloud, DeleteFromCloud } from "../utils/cloudinary.js";
 
 export const createPost = async (req, res) => {
-  const user = await userModel.findById(req.user.id);
   const { content } = req.body;
-  if (content === "")
-    return res.status(400).json({ message: "enter content" });
+  // .file from multer middleware
+  const imageLocalPath = req.file?.path;
+
+  if (!content && !imageLocalPath)
+    return res
+      .status(400)
+      .json({ message: "Post must have content or an image." });
+
+  let imageUrl = "";
+  if (imageLocalPath) {
+    //pass the file path of the uploaded file to func
+    const imgUploadRes = await UploadOnCloud(imageLocalPath);
+    if (!imgUploadRes) {
+      return res.status(500).json({ message: "Error uploading image." });
+    }
+    imageUrl = imgUploadRes.url; // Get the URL from Cloudinary
+  }
+
   const post = await postModel.create({
-    user: user._id,
-    content,
+    user: req.user.id, // Correctly use req.user.id
+    content: content || "",
+    imageUrl,
   });
-  user.posts.push(post._id);
-  await user.save();
-  //since post.user returns userid as string, populate replaces the string with actual user details
+
+  await userModel.findByIdAndUpdate(req.user.id, {
+    $push: { posts: post._id },
+  });
+
   const newPost = await postModel.findById(post._id).populate("user");
   res.status(200).json(newPost);
 };
 
 export const getMyPosts = async (req, res) => {
+  //find the posts whose user id is = to curr user id and populate it with user info
   const posts = await postModel
     .find({ user: req.user.id })
     .populate("user")
@@ -66,11 +86,10 @@ export const likeCount = async (req, res) => {
 
 export const EditPost = async (req, res) => {
   const { id: postId } = req.params;
-  const userId = req.user.id;
-  const { content } = req.body;
-  if (content === "")
-    return res.status(400).json({ message: "enter content" });
   const post = await postModel.findById(postId);
+  const userId = req.user.id;
+  const { content } = req.body
+  const imageLocalPath = req.file?.path;
 
   if (!post) {
     return res.status(404).json({ message: "Post not found." });
@@ -81,8 +100,29 @@ export const EditPost = async (req, res) => {
     });
   }
 
+  const updatedData = {
+    content: content || originalPost.content,
+    isEdited: true
+  }
+
+  //if new image in temporary storage, delete prev image from cloudinary and set the new image
+  //old image's url is directly being passed while the new image's file location is being passed
+  if (imageLocalPath) {
+    if(post.imageUrl) await DeleteFromCloud(post.imageUrl)
+    const newImgUpload = await UploadOnCloud(imageLocalPath);
+    if (!newImgUpload) {
+      return res.status(500).json({ message: "Error uploading image." });
+    }
+    //add imageUrl separatly since the user may not upload a new image
+    updatedData.imageUrl = newImgUpload.url;
+  }
+
   const updatedPost = await postModel
-    .findByIdAndUpdate(postId, { content,isEdited:true }, { new: true, runValidators: true })
+    .findByIdAndUpdate(
+      postId,
+      updatedData,
+      { new: true, runValidators: true }
+    )
     .populate("user");
   res.status(200).json({
     message: "post edited successfully",
@@ -104,8 +144,14 @@ export const DeletePost = async (req, res) => {
     });
   }
 
-  await postModel.findByIdAndDelete(postId);
-  await userModel.updateOne({ _id: userId }, { $pull: { posts: postId } });
+  if (post.imageUrl) {
+    await DeleteFromCloud(post.imageUrl);
+  }
 
-  res.status(200).json({ message: "post deleted successfully" });
+  await postModel.findByIdAndDelete(postId);
+  await userModel.findByIdAndUpdate(userId, {
+    $pull: { posts: postId },
+  });
+
+  res.status(200).json({ message: "Post deleted successfully" });
 };

@@ -13,12 +13,16 @@ export const PostContext = createContext({
   //for ui change in postform and disabling actions during editing
   postToEdit: null,
   setPostToEdit: () => {},
+  //for ui changes that takes place globally
+  globalLoading: false,
+  setGlobalLoading: () => {},
 });
 
 export const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const [postToEdit, setPostToEdit] = useState(null);
   const [mode, setMode] = useState("allposts");
+  const [globalLoading, setGlobalLoading] = useState(false);
 
   useEffect(() => {
     if (mode === "myposts") {
@@ -29,12 +33,11 @@ export const PostProvider = ({ children }) => {
     // render according to mode change
   }, [mode]);
 
-  const createPost = async (postData) => {
+  const createPost = async (formData) => {
     try {
       const res = await fetch("/api/post/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(postData),
+        body: formData,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to create post");
@@ -71,17 +74,16 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  const editPost = async (postId, postData) => {
+  const editPost = async (postId, formData) => {
     try {
       const res = await fetch(`/api/post/edit/${postId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(postData),
+        body: formData,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to edit post");
 
-      //response has message and post
+      //data has message and post
       setPosts((prevPosts) =>
         prevPosts.map((p) => (p._id === postId ? data.post : p))
       );
@@ -120,6 +122,8 @@ export const PostProvider = ({ children }) => {
         deletePost,
         postToEdit,
         setPostToEdit,
+        globalLoading,
+        setGlobalLoading,
       }}
     >
       {children}

@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      req:true
+      req: true,
     },
     date: {
       type: Date,
@@ -21,10 +21,14 @@ const postSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    isEdited:{
-      type:Boolean,
-      default:false
-    }
+    isEdited: {
+      type: Boolean,
+      default: false,
+    },
+    imageUrl: {
+      type: String, // To store the URL from Cloudinary
+      default: "",
+    },
   },
   { timestamps: true }
 );

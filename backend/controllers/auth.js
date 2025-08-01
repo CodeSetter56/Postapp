@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 
-import { cookieGen } from "../cookieGen.js";
+import { cookieGen } from "../utils/cookieGen.js";
 import userModel from "../models/user.js";
 
 export const signup = async (req, res) => {

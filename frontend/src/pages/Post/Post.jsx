@@ -1,24 +1,24 @@
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import { MdDelete } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { useAuth } from "../../context/AuthContext";
 import { usePost } from "../../context/PostContext";
 
 function Post({ post }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { setPostToEdit, deletePost, postToEdit } = usePost();
+  const { setPostToEdit, deletePost, postToEdit, setGlobalLoading } = usePost();
 
   // set default like count acc to like array length
   const [likeCount, setLikeCount] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(false);
   const [error, setError] = useState(null);
 
+  //check if user and post's user are same to dynamically show the edit and delete button
   const isPostOwner = user && post.user && user._id === post.user._id;
+  //if in this state, disable rest of the buttons (for this component)
   const isBeingEdited = postToEdit !== null;
 
   //runs on render to see if the current user previously liked the post
@@ -29,9 +29,11 @@ function Post({ post }) {
     }
   }, [post.likes, user]); //rerenders on change in likes or the user
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
-      deletePost(post._id);
+      setGlobalLoading(true);
+      await deletePost(post._id);
+      setGlobalLoading(false);
     }
   };
 
@@ -74,7 +76,10 @@ function Post({ post }) {
     <div className="card bg-base-100 w-full shadow-sm">
       <figure>
         <img
-          src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+          src={
+            post.imageUrl ||
+            "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+          }
           alt="Post"
         />
       </figure>
