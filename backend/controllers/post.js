@@ -12,21 +12,21 @@ export const createPost = async (req, res) => {
       .status(400)
       .json({ message: "Post must have content or an image." });
 
-  let imageUrl = "";
+  const postData = {
+    user: req.user.id, // Correctly use req.user.id
+    content: content || "",
+  };
+
   if (imageLocalPath) {
     //pass the file path of the uploaded file to func
     const imgUploadRes = await UploadOnCloud(imageLocalPath);
     if (!imgUploadRes) {
       return res.status(500).json({ message: "Error uploading image." });
     }
-    imageUrl = imgUploadRes.url; // Get the URL from Cloudinary
+     postData.imageUrl = imgUploadRes.url; // Get the URL from Cloudinary
   }
 
-  const post = await postModel.create({
-    user: req.user.id, // Correctly use req.user.id
-    content: content || "",
-    imageUrl,
-  });
+  const post = await postModel.create(postData)
 
   await userModel.findByIdAndUpdate(req.user.id, {
     $push: { posts: post._id },

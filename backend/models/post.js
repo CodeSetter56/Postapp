@@ -5,11 +5,11 @@ const postSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      req: true,
+      required: true,
     },
     date: {
       type: Date,
-      default: Date.now(),
+      default: Date.now,
     },
     content: {
       type: String,
@@ -27,7 +27,8 @@ const postSchema = new mongoose.Schema(
     },
     imageUrl: {
       type: String, // To store the URL from Cloudinary
-      default: "",
+      default:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTD_4ORmN_IT3F07pSTZg7oMhmJdqRP4eR7AQ&s",
     },
   },
   { timestamps: true }
