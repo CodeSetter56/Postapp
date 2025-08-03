@@ -9,7 +9,13 @@ import { usePost } from "../../context/PostContext";
 function Post({ post }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { setPostToEdit, deletePost, postToEdit, setGlobalLoading } = usePost();
+  const {
+    setPostToEdit,
+    deletePost,
+    postToEdit,
+    setGlobalLoading,
+    likeUnlikePost,
+  } = usePost();
 
   // set default like count acc to like array length
   const [likeCount, setLikeCount] = useState(post.likes.length);
@@ -32,8 +38,13 @@ function Post({ post }) {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       setGlobalLoading(true);
-      await deletePost(post._id);
-      setGlobalLoading(false);
+      try {
+        await deletePost(post._id);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setGlobalLoading(false);
+      }
     }
   };
 
@@ -44,31 +55,26 @@ function Post({ post }) {
       return;
     }
     setError("");
+
+    const originalIsLiked = isLiked;
+    const originalLikeCount = likeCount;
+
     //optimestic ui change: change the like state and count instantly for fast ui change and rollback if server doesn't respond
-    if (isLiked) {
+    if (originalIsLiked) {
       setLikeCount((prev) => prev - 1);
       setIsLiked(false);
     } else {
       setLikeCount((prev) => prev + 1);
       setIsLiked(true);
     }
+
     try {
-      const res = await fetch(`/api/post/likeUnlike/${post._id}`, {
-        method: "PUT",
-      });
-      if (!res.ok) {
-        throw new Error("Failed to update like status on the server.");
-      }
+      await likeUnlikePost(post._id, user._id);
     } catch (err) {
       setError(err.message);
       //rollback
-      if (isLiked) {
-        setLikeCount((prev) => prev + 1);
-        setIsLiked(true);
-      } else {
-        setLikeCount((prev) => prev - 1);
-        setIsLiked(false);
-      }
+      setIsLiked(originalIsLiked);
+      setLikeCount(originalLikeCount);
     }
   };
 
@@ -76,10 +82,8 @@ function Post({ post }) {
     <div className="card bg-base-100 w-full shadow-sm">
       <figure>
         <img
-          src={
-            post.imageUrl ||
-            "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-          }
+          className="w-full h-48 object-cover"
+          src={post.imageUrl}
           alt="Post"
         />
       </figure>

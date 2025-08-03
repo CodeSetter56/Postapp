@@ -29,31 +29,27 @@ function PostForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (loading) return;
+
     if (!user) {
       setError("sign in first");
       return;
     }
     setLoading(true);
-    //start a global loading when a post has started being created or edited
     setGlobalLoading(true);
     setError(null);
 
     try {
+      const formData = new FormData();
+      formData.append("content", content);
+      if (postImage) {
+        formData.append("postImage", postImage);
+      }
+
       if (postToEdit) {
-        //an object that contains all the user input data to pass to context func
-        const formData = new FormData();
-        formData.append("content", content);
-        if (postImage) {
-          formData.append("postImage", postImage);
-        }
         await editPost(postToEdit._id, formData);
       } else {
-        const formData = new FormData();
-        formData.append("content", content);
-        if (postImage) {
-          formData.append("postImage", postImage);
-        }
         await createPost(formData);
       }
     } catch (err) {
@@ -64,7 +60,6 @@ function PostForm() {
       setContent("");
       setPostImage(null);
       setPostToEdit(null);
-      //removes uploaded file from input
       if (fileInputRef.current) {
         fileInputRef.current.value = null;
       }
@@ -78,7 +73,6 @@ function PostForm() {
           <legend className="fieldset-legend text-lg">
             {postToEdit ? "Edit your post" : "Create a post"}
           </legend>
-
           <div className="w-full flex flex-col gap-2">
             <input
               type="text"
@@ -87,7 +81,6 @@ function PostForm() {
               placeholder="post"
               onChange={(e) => setContent(e.target.value)}
             />
-
             <div className="flex items-center justify-between">
               <fieldset className="fieldset flex">
                 <input
@@ -99,7 +92,6 @@ function PostForm() {
                 />
                 <label className="label">Max size 2MB</label>
               </fieldset>
-
               {postToEdit ? (
                 <div className="join-item w-1/4 flex">
                   <button

@@ -10,6 +10,7 @@ export const PostContext = createContext({
   getMyPosts: async () => {},
   editPost: async () => {},
   deletePost: async () => {},
+  likeUnlikePost: async () => {},
   //for ui change in postform and disabling actions during editing
   postToEdit: null,
   setPostToEdit: () => {},
@@ -23,6 +24,36 @@ export const PostProvider = ({ children }) => {
   const [postToEdit, setPostToEdit] = useState(null);
   const [mode, setMode] = useState("allposts");
   const [globalLoading, setGlobalLoading] = useState(false);
+
+  const getAllPosts = async () => {
+    setGlobalLoading(true);
+    try {
+      const res = await fetch("/api/post/allposts");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to fetch posts");
+      setPosts(data);
+    } catch (error) {
+      console.error(error);
+      setPosts([]);
+    } finally {
+      setGlobalLoading(false);
+    }
+  };
+
+  const getMyPosts = async () => {
+    setGlobalLoading(true);
+    try {
+      const res = await fetch("/api/post/myposts");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to fetch posts");
+      setPosts(data);
+    } catch (error) {
+      console.error(error);
+      setPosts([]);
+    } finally {
+      setGlobalLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (mode === "myposts") {
@@ -50,30 +81,6 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  const getAllPosts = async () => {
-    try {
-      const res = await fetch("/api/post/allposts");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to fetch posts");
-      setPosts(data);
-    } catch (error) {
-      console.error(error);
-      setPosts([]);
-    }
-  };
-
-  const getMyPosts = async () => {
-    try {
-      const res = await fetch("/api/post/myposts");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to fetch posts");
-      setPosts(data);
-    } catch (error) {
-      console.error(error);
-      setPosts([]);
-    }
-  };
-
   const editPost = async (postId, formData) => {
     try {
       const res = await fetch(`/api/post/edit/${postId}`, {
@@ -82,8 +89,7 @@ export const PostProvider = ({ children }) => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to edit post");
-
-      //data has message and post
+      //response has message and post
       setPosts((prevPosts) =>
         prevPosts.map((p) => (p._id === postId ? data.post : p))
       );
@@ -109,6 +115,32 @@ export const PostProvider = ({ children }) => {
     }
   };
 
+  const likeUnlikePost = async (postId, userId) => {
+    try {
+      const res = await fetch(`/api/post/likeUnlike/${postId}`, {
+        method: "PUT",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update like status on the server.");
+      }
+      // Updates posts without refresh
+      setPosts((prevPosts) =>
+        prevPosts.map((p) => {
+          if (p._id === postId) {
+            const newLikes = p.likes.includes(userId)
+              ? p.likes.filter((id) => id !== userId) // Unlike
+              : [...p.likes, userId]; // Like
+            return { ...p, likes: newLikes };
+          }
+          return p;
+        })
+      );
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
   return (
     <PostContext.Provider
       value={{
@@ -120,6 +152,7 @@ export const PostProvider = ({ children }) => {
         getMyPosts,
         editPost,
         deletePost,
+        likeUnlikePost,
         postToEdit,
         setPostToEdit,
         globalLoading,
