@@ -22,29 +22,31 @@ function UserPosts() {
   }
 
   return (
-    <div className="w-full flex flex-col items-start gap-4">
+    <div className="w-full flex flex-wrap justify-between items-center gap-y-2">
       <div className="w-full flex justify-between items-center">
         <h2 className="text-2xl font-bold">Posts</h2>
-        {user && (<div className="flex gap-3">
-          <button
-            className={`btn ${
-              mode === "allposts" ? "btn-ghost" : "btn-primary"
-            }`}
-            onClick={handleMode}
-            value="allposts"
-          >
-            All Posts
-          </button>
-          <button
-            className={`btn ${
-              mode === "myposts" ?  "btn-ghost" : "btn-primary" 
-            }`}
-            onClick={handleMode}
-            value="myposts"
-          >
-            My Posts
-          </button>
-        </div>)}
+        {user && (
+          <div className="flex gap-3">
+            <button
+              className={`btn ${
+                mode === "allposts" ? "btn-ghost" : "btn-primary"
+              }`}
+              onClick={handleMode}
+              value="allposts"
+            >
+              All Posts
+            </button>
+            <button
+              className={`btn ${
+                mode === "myposts" ? "btn-ghost" : "btn-primary"
+              }`}
+              onClick={handleMode}
+              value="myposts"
+            >
+              My Posts
+            </button>
+          </div>
+        )}
       </div>
 
       {posts.length > 0 ? (

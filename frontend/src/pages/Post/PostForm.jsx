@@ -16,7 +16,7 @@ function PostForm() {
     usePost();
   const { user } = useAuth();
 
-  //check if a post is in editing mode and set it's content in input form
+  //check if a post is in editing mode and set its content in input form
   useEffect(() => {
     if (postToEdit) {
       setContent(postToEdit.content);
@@ -69,40 +69,48 @@ function PostForm() {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-2xl border p-6 flex flex-col items-center">
-          <legend className="fieldset-legend text-lg">
+        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-full max-w-2xl border p-6 flex flex-col items-center">
+          <legend className="fieldset-legend text-lg font-semibold">
             {postToEdit ? "Edit your post" : "Create a post"}
           </legend>
-          <div className="w-full flex flex-col gap-2">
+          <div className="w-full flex flex-col gap-4">
+            {" "}
+            {/* Increased gap */}
             <input
               type="text"
-              className="input w-full"
+              className="input input-bordered w-full" // Added input-bordered for style
               value={content}
-              placeholder="post"
+              placeholder="What's on your mind?"
               onChange={(e) => setContent(e.target.value)}
             />
-            <div className="flex items-center justify-between">
-              <fieldset className="fieldset flex">
+            {/* --- RESPONSIVE CONTAINER --- */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              {/* --- FILE INPUT --- */}
+              <fieldset className="fieldset flex flex-col sm:flex-row sm:items-center gap-2 w-full md:w-auto">
                 <input
                   ref={fileInputRef}
                   type="file"
                   name="postImage"
-                  className="file-input"
+                  className="file-input file-input-bordered w-full max-w-xs"
                   onChange={(e) => setPostImage(e.target.files[0])}
                 />
-                <label className="label">Max size 2MB</label>
+                <label className="label">
+                  <span className="label-text-alt">Max size 2MB</span>
+                </label>
               </fieldset>
+
+              {/* --- ACTION BUTTONS --- */}
               {postToEdit ? (
-                <div className="join-item w-1/4 flex">
+                <div className="join-item w-full md:w-1/4 flex">
                   <button
-                    className="btn w-1/2"
+                    className="btn btn-primary w-1/2"
                     type="submit"
                     disabled={loading}
                   >
                     <FiSave />
                   </button>
                   <button
-                    className="btn w-1/2"
+                    className="btn btn-ghost w-1/2"
                     type="button"
                     onClick={() => setPostToEdit(null)}
                     disabled={loading}
@@ -112,7 +120,7 @@ function PostForm() {
                 </div>
               ) : (
                 <button
-                  className="btn join-item w-1/4"
+                  className="btn btn-primary join-item w-full md:w-1/4"
                   type="submit"
                   disabled={loading}
                 >
@@ -123,7 +131,7 @@ function PostForm() {
           </div>
         </fieldset>
       </form>
-      {error && <div className="text-red-600">{error}</div>}
+      {error && <div className="text-red-600 mt-2">{error}</div>}
     </div>
   );
 }

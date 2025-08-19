@@ -82,7 +82,7 @@ function Navbar() {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 p-2 shadow"
               >
                 <li>
-                  <Link className="text-lg">Profile</Link>
+                  <Link to={"/profile"} className="text-lg btn">Profile</Link>
                 </li>
                 <li>
                   <form onSubmit={handleLogout}>

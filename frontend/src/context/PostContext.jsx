@@ -28,7 +28,7 @@ export const PostProvider = ({ children }) => {
   const getAllPosts = async () => {
     setGlobalLoading(true);
     try {
-      const res = await fetch("/api/post/allposts");
+      const res = await fetch("http://localhost:9001/api/post/allposts");
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to fetch posts");
       setPosts(data);
@@ -43,7 +43,7 @@ export const PostProvider = ({ children }) => {
   const getMyPosts = async () => {
     setGlobalLoading(true);
     try {
-      const res = await fetch("/api/post/myposts");
+      const res = await fetch("http://localhost:9001/api/post/myposts");
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to fetch posts");
       setPosts(data);
@@ -66,7 +66,7 @@ export const PostProvider = ({ children }) => {
 
   const createPost = async (formData) => {
     try {
-      const res = await fetch("/api/post/create", {
+      const res = await fetch("http://localhost:9001/api/post/create", {
         method: "POST",
         body: formData,
       });
@@ -83,7 +83,7 @@ export const PostProvider = ({ children }) => {
 
   const editPost = async (postId, formData) => {
     try {
-      const res = await fetch(`/api/post/edit/${postId}`, {
+      const res = await fetch(`http://localhost:9001/api/post/edit/${postId}`, {
         method: "PUT",
         body: formData,
       });
@@ -102,9 +102,12 @@ export const PostProvider = ({ children }) => {
 
   const deletePost = async (postId) => {
     try {
-      const res = await fetch(`/api/post/delete/${postId}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `http://localhost:9001/api/post/delete/${postId}`,
+        {
+          method: "DELETE",
+        }
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to delete post");
       setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
@@ -117,9 +120,12 @@ export const PostProvider = ({ children }) => {
 
   const likeUnlikePost = async (postId, userId) => {
     try {
-      const res = await fetch(`/api/post/likeUnlike/${postId}`, {
-        method: "PUT",
-      });
+      const res = await fetch(
+        `http://localhost:9001/api/post/likeUnlike/${postId}`,
+        {
+          method: "PUT",
+        }
+      );
       if (!res.ok) {
         throw new Error("Failed to update like status on the server.");
       }

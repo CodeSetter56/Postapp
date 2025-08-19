@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   
 
   const signup = async (userData) => {
-    const res = await fetch("/api/auth/signup", {
+    const res = await fetch("http://localhost:9001/api/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (userData) => {
-    const res = await fetch("/api/auth/login", {
+    const res = await fetch("http://localhost:9001/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    const res = await fetch("/api/auth/logout", {
+    const res = await fetch("http://localhost:9001/api/auth/logout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

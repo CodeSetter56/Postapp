@@ -1,6 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 import PostForm from "./Post/PostForm";
-import UserPosts from "./Post/UserPosts"
+import UserPosts from "./Post/UserPosts";
 
 function Home() {
   const { user, loading } = useAuth();
@@ -12,19 +12,17 @@ function Home() {
   return (
     <div>
       {user ? (
-        <div className="flex flex-col gap-10 p-4 md:p-10">
+        // Apply flex column and center items here
+        <div className="flex flex-col items-center gap-10 p-4 md:p-10">
           <h1 className="text-4xl md:text-7xl text-center font-bold">
             Welcome, {user.username}
           </h1>
-          <div className="flex justify-center">
-            <PostForm />
-          </div>
-          <div className="flex justify-center">
-            <UserPosts />
-          </div>
+          {/* No extra wrapper divs needed */}
+          <PostForm />
+          <UserPosts />
         </div>
       ) : (
-        <div className="flex flex-col gap-10 p-4 md:p-10">
+        <div className="flex flex-col items-center gap-10 p-4 md:p-10">
           <h1 className="text-4xl text-center md:text-7xl font-bold">
             Welcome, Guest
           </h1>
