@@ -25,10 +25,13 @@ export const PostProvider = ({ children }) => {
   const [mode, setMode] = useState("allposts");
   const [globalLoading, setGlobalLoading] = useState(false);
 
+  const url = "https://postapp-backend-3nea.onrender.com";
+  // const url: "http://localhost:9001",
+
   const getAllPosts = async () => {
     setGlobalLoading(true);
     try {
-      const res = await fetch("http://localhost:9001/api/post/allposts", {
+      const res = await fetch(`${url}/api/post/allposts`, {
         method: "GET",
         credentials: "include",
       });
@@ -46,7 +49,7 @@ export const PostProvider = ({ children }) => {
   const getMyPosts = async () => {
     setGlobalLoading(true);
     try {
-      const res = await fetch("http://localhost:9001/api/post/myposts", {
+      const res = await fetch(`${url}/api/post/myposts`, {
         method: "GET",
         credentials: "include",
       });
@@ -72,7 +75,7 @@ export const PostProvider = ({ children }) => {
 
   const createPost = async (formData) => {
     try {
-      const res = await fetch("http://localhost:9001/api/post/create", {
+      const res = await fetch(`${url}/api/post/create`, {
         method: "POST",
         body: formData,
         credentials: "include",
@@ -90,7 +93,7 @@ export const PostProvider = ({ children }) => {
 
   const editPost = async (postId, formData) => {
     try {
-      const res = await fetch(`http://localhost:9001/api/post/edit/${postId}`, {
+      const res = await fetch(`${url}/api/post/edit/${postId}`, {
         method: "PUT",
         body: formData,
         credentials: "include",
@@ -110,13 +113,10 @@ export const PostProvider = ({ children }) => {
 
   const deletePost = async (postId) => {
     try {
-      const res = await fetch(
-        `http://localhost:9001/api/post/delete/${postId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${url}/api/post/delete/${postId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to delete post");
       setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
@@ -129,13 +129,10 @@ export const PostProvider = ({ children }) => {
 
   const likeUnlikePost = async (postId, userId) => {
     try {
-      const res = await fetch(
-        `http://localhost:9001/api/post/likeUnlike/${postId}`,
-        {
-          method: "PUT",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${url}/api/post/likeUnlike/${postId}`, {
+        method: "PUT",
+        credentials: "include",
+      });
       if (!res.ok) {
         throw new Error("Failed to update like status on the server.");
       }
