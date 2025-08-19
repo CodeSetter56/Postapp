@@ -17,7 +17,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkUser = async() =>{
       try {
-        const res = await fetch("api/user/me")
+        const res = await fetch("http://localhost:9001/api/user/me",{
+          method: "GET",
+          credentials: "include",
+        });
         if(res.ok){
           const data = await res.json()
           setUser(data)
@@ -46,6 +49,7 @@ export const AuthProvider = ({ children }) => {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(userData),
     });
     const data = await res.json();
@@ -63,6 +67,7 @@ export const AuthProvider = ({ children }) => {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify(userData),
     });
     const data = await res.json();
@@ -77,6 +82,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     const res = await fetch("http://localhost:9001/api/auth/logout", {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },

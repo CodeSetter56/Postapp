@@ -28,7 +28,10 @@ export const PostProvider = ({ children }) => {
   const getAllPosts = async () => {
     setGlobalLoading(true);
     try {
-      const res = await fetch("http://localhost:9001/api/post/allposts");
+      const res = await fetch("http://localhost:9001/api/post/allposts", {
+        method: "GET",
+        credentials: "include",
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to fetch posts");
       setPosts(data);
@@ -43,7 +46,10 @@ export const PostProvider = ({ children }) => {
   const getMyPosts = async () => {
     setGlobalLoading(true);
     try {
-      const res = await fetch("http://localhost:9001/api/post/myposts");
+      const res = await fetch("http://localhost:9001/api/post/myposts", {
+        method: "GET",
+        credentials: "include",
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to fetch posts");
       setPosts(data);
@@ -69,6 +75,7 @@ export const PostProvider = ({ children }) => {
       const res = await fetch("http://localhost:9001/api/post/create", {
         method: "POST",
         body: formData,
+        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to create post");
@@ -86,6 +93,7 @@ export const PostProvider = ({ children }) => {
       const res = await fetch(`http://localhost:9001/api/post/edit/${postId}`, {
         method: "PUT",
         body: formData,
+        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to edit post");
@@ -106,6 +114,7 @@ export const PostProvider = ({ children }) => {
         `http://localhost:9001/api/post/delete/${postId}`,
         {
           method: "DELETE",
+          credentials: "include",
         }
       );
       const data = await res.json();
@@ -124,6 +133,7 @@ export const PostProvider = ({ children }) => {
         `http://localhost:9001/api/post/likeUnlike/${postId}`,
         {
           method: "PUT",
+          credentials: "include",
         }
       );
       if (!res.ok) {
